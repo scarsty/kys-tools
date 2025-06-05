@@ -12,11 +12,11 @@
 
 比较完整的复刻版还有：
 
-https://github.com/kt2/kys-js
+js版：<https://github.com/kt2/kys-js>
 
-https://github.com/soarqin/HeroesOfJinYong
+soarqin的C++版：<https://github.com/soarqin/HeroesOfJinYong>
 
-https://gitee.com/zgames/jy-remake（https://github.com/scarsty/jy-remake）
+zgames的C++/Lua版：<https://gitee.com/zgames/jy-remake> (<https://github.com/scarsty/jy-remake>)
 
 
 # 其他单独发布的工具
@@ -29,4 +29,4 @@ sfe：<https://github.com/godka/sfe/> fishedit的改进版，版本众多，这�
 
 sfe2：<https://github.com/godka/sfe2> KA重新编写的修改器，只有命令行，有一些错误
 
-sfe2-kdef: <https://github.com/godka/sfe-kdef> KA编写的将DOS版的指令事件转为Lua脚本的工具
+sfe2-kdef：<https://github.com/godka/sfe-kdef> KA编写的将DOS版的指令事件转为Lua脚本的工具
