@@ -6,7 +6,8 @@
     <LocalDebuggerWorkingDirectory>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data\ka1043.lua</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data\ka771.lua</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

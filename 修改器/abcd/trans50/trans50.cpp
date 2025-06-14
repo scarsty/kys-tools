@@ -25,10 +25,6 @@ void trans50(std::string file, std::string talk_path)
     auto e_get = [&next_parameter](int bit, int t, int x) -> std::string
     {
         int i = t & (1 << bit);
-        if (x == 9999999)
-        {
-            return "temp";
-        }
         if (i == 0)
         {
             return std::to_string(x);
@@ -142,15 +138,51 @@ void trans50(std::string file, std::string talk_path)
                     }
                     break;
                 }
+                case 9:
+                {
+                    str = std::format("x[{}] = string.format({}, {});", e2, e3, e_get(0, e1, e4));
+                    break;
+                }
                 case 10:
                 {
                     str = std::format("x[{}] = length(x[{}]);", e2, e1);
+                    break;
+                }
+                case 11:
+                {
+                    str = std::format("x[{}] = x[{}]..x[{}];", e3, e1, e2);
+                    break;
+                }
+                case 12:
+                {
+                    str = std::format("x[{}] = string.space({});", e2, e_GetValue(0, e1, e3));
                     break;
                 }
                 case 16:
                 {
                     std::vector<std::string> names = { "role", "item", "submap", "magic", "shop" };
                     str = std::format("{}({}).data({}) = {};", names[e2], e_GetValue(0, e1, e3), e_GetValue(1, e1, e4), e_GetValue(2, e1, e5));
+                    break;
+                }
+                case 17:
+                {
+                    std::vector<std::string> names = { "role", "item", "submap", "magic", "shop" };
+                    str = std::format("x[{}] = {}({}).data({});", e5, names[e2], e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
+                    break;
+                }
+                case 18:
+                {
+                    str = std::format("SetTeam({}, {});", e_GetValue(0, e1, e2), e_GetValue(0, e1, e3));
+                    break;
+                }
+                case 19:
+                {
+                    str = std::format("x[{}] = GetTeam({});", e3, e_GetValue(0, e1, e2));
+                    break;
+                }
+                case 20:
+                {
+                    str = std::format("x[{}] = GetItemAmount({});", e3, e_GetValue(0, e1, e2));
                     break;
                 }
                 case 21:
@@ -162,6 +194,22 @@ void trans50(std::string file, std::string talk_path)
                 case 22:
                 {
                     str = std::format("x[{}] = ddata({}, {}, {});", e5, e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4));
+                    break;
+                }
+                case 23:
+                {
+                    str = std::format("sdata({}, {}, {}, {}) = {};", e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5), e_GetValue(4, e1, e6));
+                    break;
+                }
+                case 24:
+                {
+                    str = std::format("x[{}] = sdata({}, {}, {}, {});", e6, e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5));
+                    break;
+                }
+                case 25:
+                {
+                    str = std::format("write_mem(0x{:x} + {}, {});", e3 + e4 * 0x10000, e_GetValue(1, e1, e6),
+                        e_GetValue(0, e1, e5));
                     break;
                 }
                 case 26:
@@ -182,9 +230,20 @@ void trans50(std::string file, std::string talk_path)
                     next_parameter = e3;
                     break;
                 }
+                case 33:
+                {
+                    str = std::format("DrawString(x[{}], {}, {}, {});", e2, e_GetValue(0, e1, e3), e_GetValue(1, e1, e4), e_GetValue(2, e1, e5));
+                    next_parameter = -1;
+                    break;
+                }
                 case 34:
                 {
                     str = std::format("DrawRect({}, {}, {}, {});", e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5));
+                    break;
+                }
+                case 35:
+                {
+                    str = std::format("x[{}] = lib.GetKey();", e1);
                     break;
                 }
                 case 36:
@@ -192,19 +251,68 @@ void trans50(std::string file, std::string talk_path)
                     str = std::format("x[28672] = showmessage(x[{}], {}, {}, {});", e2, e_GetValue(0, e1, e3), e_GetValue(1, e1, e4), e_GetValue(2, e1, e5));
                     break;
                 }
+                case 37:
+                {
+                    str = std::format("lib.Delay({});", e_GetValue(0, e1, e2));
+                    break;
+                }
+                case 38:
+                {
+                    str = std::format("x[{}] = math.random({});", e3, e_GetValue(0, e1, e2));
+                    break;
+                }
                 case 39:
                 case 40:
                 {
                     str = "strs = {};\n";
-                    str += std::format("for i=1,{} do\n", e_GetValue(0, e1, e2));
-                    str += std::format("strs[i] = x[x[{}]+i-1];\n", e3);
+                    str += std::format("for i=1, {} do\n", e_GetValue(0, e1, e2));
+                    str += std::format("strs[i] = x[x[{}] + i - 1];\n", e3);
                     str += "end\n";
                     str += std::format("x[{}] = menu(strs, #strs, {}, {});", e4, e_GetValue(1, e1, e5), e_GetValue(2, e1, e6));
                     break;
                 }
+                case 41:
+                {
+                    //画图
+                    if (e2 == 0)
+                    {
+                        str = std::format("DrawMainImage({} / 2, {}, {});", e_GetValue(2, e1, e5), e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
+                    }
+                    else if (e2 == 1)
+                    {
+                        str = std::format("DrawMainImage({} / 2, {}, {});", e_GetValue(2, e1, e5), e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
+                    }
+                }
                 }
             }
             str = std::format("{}{}        --{}", std::string(0, ' '), str, line.substr(pos));
+        }
+        else
+        {
+            auto pos_l = line.find("(");
+            auto pos_r = line.find(")");
+            if (pos_l != std::string::npos && pos_r != std::string::npos && pos_l < pos_r)
+            {
+                std::string params = line.substr(pos_l + 1, pos_r - pos_l - 1);
+                std::vector<std::string> param_list = strfunc::splitString(params, ",", true);
+                if (next_parameter >= 0 && next_parameter < param_list.size())
+                {
+                    param_list[next_parameter] = "9999999";
+                    next_parameter = -1;
+                }
+                auto not_space = line.find_first_not_of(" \t");
+                str = line.substr(not_space, pos_l - not_space + 1);
+                for (int i = 0; i < param_list.size(); i++)
+                {
+                    std::string param = param_list[i];
+                    str += param;
+                    if (i != param_list.size() - 1)
+                    {
+                        str += ", ";
+                    }                    
+                }
+                str += line.substr(pos_r);
+            }
         }
         strfunc::replaceOneSubStringRef(str, "9999999", "temp");
         strfunc::replaceOneSubStringRef(str, "CheckRoleSexual(256)", "jump_flag");
@@ -216,7 +324,7 @@ void trans50(std::string file, std::string talk_path)
 
 int main(int argc, char* argv[])
 {
-    if (argc>1)
+    if (argc > 1)
     {
         trans50(argv[1], ".");
     }
