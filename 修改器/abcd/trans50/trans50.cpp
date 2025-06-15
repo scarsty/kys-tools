@@ -4,9 +4,6 @@
 #include <iostream>
 
 #include <string>
-
-#include "GrpIdxFile.h"
-#include "PotConv.h"
 #include "filefunc.h"
 #include "strfunc.h"
 #include <format>
@@ -40,21 +37,7 @@ void trans50(std::string file, std::string talk_path)
     };
     auto e_GetValue = e_get;
     //读对话
-    std::vector<int> offset, length;
-    auto talk = GrpIdxFile::getIdxContent(talk_path + "/talk.idx", talk_path + "/talk.grp", &offset, &length);
-    for (int i = 0; i < offset.back(); i++)
-    {
-        if (talk[i])
-        {
-            talk[i] = talk[i] ^ 0xff;
-        }
-    }
-    std::vector<std::string> talk_contents;
-    for (int i = 0; i < length.size(); i++)
-    {
-        std::string str = strfunc::replaceAllSubString(PotConv::cp950toutf8(talk.data() + offset[i]), "*", "");
-        talk_contents.push_back(str);
-    }
+    std::vector<std::string> talk_contents = strfunc::splitString(strfunc::replaceAllSubString(filefunc::readFileToString(talk_path + "/talkutf8.txt"), "\r", ""), "\n", false);
 
     for (auto& line : lines)
     {
@@ -309,7 +292,7 @@ void trans50(std::string file, std::string talk_path)
                     if (i != param_list.size() - 1)
                     {
                         str += ", ";
-                    }                    
+                    }
                 }
                 str += line.substr(pos_r);
             }

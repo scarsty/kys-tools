@@ -18,13 +18,7 @@
     <ClCompile Include="trans50.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GrpIdxFile.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="filefunc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="PotConv.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="strfunc.cpp">
@@ -32,13 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GrpIdxFile.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="filefunc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="PotConv.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="strfunc.h">
