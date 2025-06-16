@@ -1,13 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data\ka691.lua</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--50 --in "event"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerWorkingDirectory>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data\ka771.lua</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--talk --in D:\kys-all\kys-pascal\all-mod\kys-awaken\resource</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerWorkingDirectory>D:\kys-all\kys-pascal\all-mod\sfe-kdef2script\data\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

@@ -3,20 +3,21 @@
 
 #include <iostream>
 
-#include <string>
 #include "filefunc.h"
 #include "strfunc.h"
 #include <format>
 #include <print>
+#include <string>
 #include <vector>
 
-void trans50(std::string file, std::string talk_path)
+extern std::vector<std::string> talks_;
+
+std::string trans50(std::string str)
 {
     std::string result;
 
-    std::string content = filefunc::readFileToString(file);
-    strfunc::replaceAllSubStringRef(content, "\r", "");
-    std::vector<std::string> lines = strfunc::splitString(content, "\n", false);
+    strfunc::replaceAllSubStringRef(str, "\r", "");
+    std::vector<std::string> lines = strfunc::splitString(str, "\n", false);
 
     int next_parameter = -1;
     auto e_get = [&next_parameter](int bit, int t, int x) -> std::string
@@ -37,7 +38,7 @@ void trans50(std::string file, std::string talk_path)
     };
     auto e_GetValue = e_get;
     //读对话
-    std::vector<std::string> talk_contents = strfunc::splitString(strfunc::replaceAllSubString(filefunc::readFileToString(talk_path + "/talkutf8.txt"), "\r", ""), "\n", false);
+    std::vector<std::string>& talk_contents = talks_;
 
     for (auto& line : lines)
     {
@@ -236,7 +237,7 @@ void trans50(std::string file, std::string talk_path)
                 }
                 case 37:
                 {
-                    str = std::format("lib.Delay({});", e_GetValue(0, e1, e2));
+                    str = std::format("Delay({});", e_GetValue(0, e1, e2));
                     break;
                 }
                 case 38:
@@ -266,61 +267,59 @@ void trans50(std::string file, std::string talk_path)
                         str = std::format("DrawMainImage({} / 2, {}, {});", e_GetValue(2, e1, e5), e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
                     }
                 }
+                case 43:
+                {
+                    str = std::format("x[28928] = {};\n", e_GetValue(1, e1, e3));
+                    str += std::format("x[28929] = {};\n", e_GetValue(2, e1, e4));
+                    str += std::format("x[28930] = {};\n", e_GetValue(3, e1, e5));
+                    str += std::format("x[28931] = {};\n", e_GetValue(4, e1, e6));
+                    str += std::format("CallEvent({});", e_GetValue(0, e1, e2));
+                    break;
+                }
                 }
             }
             str = std::format("{}{}        --{}", std::string(0, ' '), str, line.substr(pos));
         }
         else
         {
-            auto pos_l = line.find("(");
-            auto pos_r = line.find(")");
-            if (pos_l != std::string::npos && pos_r != std::string::npos && pos_l < pos_r)
+            if (next_parameter > 0)
             {
-                std::string params = line.substr(pos_l + 1, pos_r - pos_l - 1);
-                std::vector<std::string> param_list = strfunc::splitString(params, ",", true);
-                if (next_parameter >= 0 && next_parameter < param_list.size())
+                auto pos_l = line.find("(");
+                auto pos_r = line.find(")");
+                if (pos_l != std::string::npos && pos_r != std::string::npos && pos_l < pos_r)
                 {
-                    param_list[next_parameter] = "9999999";
-                    next_parameter = -1;
-                }
-                auto not_space = line.find_first_not_of(" \t");
-                str = line.substr(not_space, pos_l - not_space + 1);
-                for (int i = 0; i < param_list.size(); i++)
-                {
-                    std::string param = param_list[i];
-                    str += param;
-                    if (i != param_list.size() - 1)
+                    std::string params = line.substr(pos_l + 1, pos_r - pos_l - 1);
+                    std::vector<std::string> param_list = strfunc::splitString(params, ",", true);
+                    if (next_parameter > 0 && next_parameter <= param_list.size())
                     {
-                        str += ", ";
+                        param_list[next_parameter - 1] = "9999999";
+                        next_parameter = -1;
                     }
+                    auto not_space = line.find_first_not_of(" \t");
+                    str = line.substr(not_space, pos_l - not_space + 1);
+                    for (int i = 0; i < param_list.size(); i++)
+                    {
+                        std::string param = param_list[i];
+                        str += param;
+                        if (i != param_list.size() - 1)
+                        {
+                            str += ", ";
+                        }
+                    }
+                    str += line.substr(pos_r);
                 }
-                str += line.substr(pos_r);
+                else
+                {
+                    str = line;
+                }
             }
         }
         strfunc::replaceOneSubStringRef(str, "9999999", "temp");
         strfunc::replaceOneSubStringRef(str, "CheckRoleSexual(256)", "jump_flag");
-        printf("%s\n", str.c_str());
+        //printf("%s\n", str.c_str());
         result += str + "\n";
     }
-    filefunc::writeStringToFile(result, "out.lua");
+    result.pop_back();    //去掉最后一个换行符
+    //filefunc::writeStringToFile(result, "out.lua");
+    return result;
 }
-
-int main(int argc, char* argv[])
-{
-    if (argc > 1)
-    {
-        trans50(argv[1], ".");
-    }
-    return 0;
-}
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门使用技巧:
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件

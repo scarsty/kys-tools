@@ -129,11 +129,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="filefunc.cpp" />
+    <ClCompile Include="GrpIdxFile.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="PotConv.cpp" />
     <ClCompile Include="strfunc.cpp" />
     <ClCompile Include="trans50.cpp" />
+    <ClCompile Include="transk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="filefunc.h" />
+    <ClInclude Include="GrpIdxFile.h" />
+    <ClInclude Include="PotConv.h" />
     <ClInclude Include="strfunc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

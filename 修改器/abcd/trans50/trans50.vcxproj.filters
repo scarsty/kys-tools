@@ -24,12 +24,30 @@
     <ClCompile Include="strfunc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="transk.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PotConv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GrpIdxFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="filefunc.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="strfunc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PotConv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GrpIdxFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
