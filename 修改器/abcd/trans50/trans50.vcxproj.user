@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>--50 --in "event"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments> --kdef --in D:\kys-all\kys-pascal\all-mod\kys-pineapple\resource</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>--talk --in D:\kys-all\kys-pascal\all-mod\kys-awaken\resource</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--kdef --in "D:\kys-all\kys-pascal\all-mod\kys-pineapple\resource"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

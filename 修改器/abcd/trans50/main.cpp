@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         }
 
         filefunc::makePath(path_out);
-        init_ins(filefunc::getFilePath(argv[0]) + "/transk.ini", path);
+        init_ins("transk.ini", path);
         for (int i = 0; i < kdef_.size(); i++)
         {
             auto str = transk(kdef_[i]);
@@ -69,12 +69,13 @@ int main(int argc, char* argv[])
                 str = trans50(str);
             }
             filefunc::writeStringToFile(str, path_out + "/ka" + std::to_string(i) + ".lua");
+            printf("ka%d.lua\r", i);
         }
     }
 
     if (cmd.exist("50") && !cmd.exist("kdef"))
     {
-        init_ins(filefunc::getFilePath(argv[0]) + "/transk.ini", cmd.get<std::string>("talkpath"));
+        init_ins("transk.ini", cmd.get<std::string>("talkpath"));
         if (cmd.exist("in"))
         {
             auto path = cmd.get<std::string>("in");

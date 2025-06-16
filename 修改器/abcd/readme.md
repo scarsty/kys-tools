@@ -20,7 +20,7 @@ trans50 --talk --in path
 该功能会去掉*，改为游戏中自动计算换行。如果有特殊需求建议自己修改代码处理。
 
 
-## 将原版指令转为lua脚本。
+## 将原版指令转为lua脚本
 
 ```
 trans50 --kdef --in path --out path_out
@@ -39,3 +39,11 @@ trans50 --50 --in path --talkpath talkpath --out path_out
 path为上一步转换脚本的文件夹，talkpath为查找对话文件的位置，实际上可以认为是上一个功能输入文件夹。
 
 执行之后会在输出目录的event50文件夹下面得到50指令翻译后的脚本，如果原脚本不含50指令则不会有输出。此处得到的脚本更容易阅读，但因一些关键字不同，不保证能正常执行。如有进一步需求建议自行修改相关代码。
+
+## 批处理范例
+
+```bat
+trans50 --talk --in %1
+trans50 --kdef --in %1
+trans50 --50 --in ./event --talkpath %1
+```

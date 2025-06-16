@@ -26,7 +26,7 @@ std::vector<std::string> get_talks(std::string path)
     {
         std::string str = strfunc::replaceAllSubString(PotConv::cp950toutf8(talk.data() + offset[i]), "*", "");
         strfunc::replaceAllSubStringRef(str, "\r", "");
-        strfunc::replaceAllSubStringRef(str, "\n", "");       
+        strfunc::replaceAllSubStringRef(str, "\n", "");
         talk_contents.push_back(str);
     }
     return talk_contents;
@@ -62,7 +62,7 @@ void trans_talks(std::string talk_path)
     {
         str += talk + "\n";
     }
-    filefunc::writeStringToFile(str, "talkutf8.txt");
+    filefunc::writeStringToFile(str, talk_path + "/talkutf8.txt");
 }
 
 void init_ins(std::string ini_file, std::string path)
@@ -97,15 +97,15 @@ void init_ins(std::string ini_file, std::string path)
     {
         talks_ = get_talks(path);
     }
-}
-
-std::string transk( const std::vector<int> e)
-{
     if (ins_.empty())
     {
-        init_ins("transk.ini", ".");
+        printf("Error of ini file!\n");
+        exit(1);
     }
+}
 
+std::string transk(const std::vector<int> e)
+{
     int i = 0, i_line = 0;
     std::map<double, std::string> lines;    //索引为指令的位置，方便处理偏移
     while (i < e.size())
@@ -164,7 +164,6 @@ std::string transk( const std::vector<int> e)
                 strfunc::replaceAllSubStringRef(str, "label#y", label1);
                 lines[index1] = "::" + label1 + "::";
             }
-            
         }
 
         while (1)

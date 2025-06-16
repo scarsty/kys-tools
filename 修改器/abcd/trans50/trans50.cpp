@@ -88,24 +88,24 @@ std::string trans50(std::string str)
                 }
                 case 4:
                 {
-                    std::vector<std::string> op = { "<", "<=", "==", "!=", ">=", ">" };
+                    std::vector<std::string> op = { "<", "<=", "==", "~=", ">=", ">" };
                     if (e2 >= 0 && e2 <= 5)
                     {
-                        str = std::format("if x[{}] {} {} then jump_flag = false; else jump_flag = true; end;", e3, op[e2], e_get(0, e1, e4));
+                        str = std::format("if x[{}] {} {} then jump_flag = true; else jump_flag = false; end;", e3, op[e2], e_get(0, e1, e4));
                     }
                     else if (e2 == 6)
                     {
-                        str = "jump_flag = false;";
+                        str = "jump_flag = true;";
                     }
                     else if (e2 == 7)
                     {
-                        str = "jump_flag = true;";
+                        str = "jump_flag = false;";
                     }
                     break;
                 }
                 case 5:
                 {
-                    str = "x = {};";
+                    str = "for i=0, 30000 do x[i]=0; end;";
                     break;
                 }
                 case 6: break;
@@ -118,7 +118,7 @@ std::string trans50(std::string str)
                     }
                     else
                     {
-                        str = std::format("x[{}] = talk({});", e3, e_get(0, e1, e2));
+                        str = std::format("x[{}] = GetTalk({});", e3, e_get(0, e1, e2));
                     }
                     break;
                 }
@@ -129,7 +129,7 @@ std::string trans50(std::string str)
                 }
                 case 10:
                 {
-                    str = std::format("x[{}] = length(x[{}]);", e2, e1);
+                    str = std::format("x[{}] = DrawLength(x[{}]);", e2, e1);
                     break;
                 }
                 case 11:
@@ -139,19 +139,19 @@ std::string trans50(std::string str)
                 }
                 case 12:
                 {
-                    str = std::format("x[{}] = string.space({});", e2, e_GetValue(0, e1, e3));
+                    str = std::format("x[{}] = string.rep(\" \", {});", e2, e_GetValue(0, e1, e3));
                     break;
                 }
                 case 16:
                 {
-                    std::vector<std::string> names = { "role", "item", "submap", "magic", "shop" };
-                    str = std::format("{}({}).data({}) = {};", names[e2], e_GetValue(0, e1, e3), e_GetValue(1, e1, e4), e_GetValue(2, e1, e5));
+                    std::vector<std::string> names = { "Role", "Item", "SubmapInfo", "Magic", "Shop" };
+                    str = std::format("Set{}({}, {} / 2, {});", names[e2], e_GetValue(0, e1, e3), e_GetValue(1, e1, e4), e_GetValue(2, e1, e5));
                     break;
                 }
                 case 17:
                 {
-                    std::vector<std::string> names = { "role", "item", "submap", "magic", "shop" };
-                    str = std::format("x[{}] = {}({}).data({});", e5, names[e2], e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
+                    std::vector<std::string> names = { "Role", "Item", "SubmapInfo", "Magic", "Shop" };
+                    str = std::format("x[{}] = Get{}({}, {} / 2);", e5, names[e2], e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
                     break;
                 }
                 case 18:
@@ -171,40 +171,48 @@ std::string trans50(std::string str)
                 }
                 case 21:
                 {
-                    str = std::format("ddata({}, {}, {}) = {};", e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5));
+                    str = std::format("SetD({}, {}, {}, {});", e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5));
 
                     break;
                 }
                 case 22:
                 {
-                    str = std::format("x[{}] = ddata({}, {}, {});", e5, e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4));
+                    str = std::format("x[{}] = GetD({}, {}, {});", e5, e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4));
                     break;
                 }
                 case 23:
                 {
-                    str = std::format("sdata({}, {}, {}, {}) = {};", e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5), e_GetValue(4, e1, e6));
+                    str = std::format("SetS({}, {}, {}, {}, {});", e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5), e_GetValue(4, e1, e6));
                     break;
                 }
                 case 24:
                 {
-                    str = std::format("x[{}] = sdata({}, {}, {}, {});", e6, e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5));
+                    str = std::format("x[{}] = GetS({}, {}, {}, {});", e6, e_GetValue(0, e1, e2), e_GetValue(1, e1, e3), e_GetValue(2, e1, e4), e_GetValue(3, e1, e5));
                     break;
                 }
                 case 25:
                 {
+                    if (e3 < 0)
+                    {
+                        e3 += 65536;    //处理负数地址
+                    }
                     str = std::format("write_mem(0x{:x} + {}, {});", e3 + e4 * 0x10000, e_GetValue(1, e1, e6),
                         e_GetValue(0, e1, e5));
                     break;
                 }
                 case 26:
                 {
+                    if (e3 < 0)
+                    {
+                        e3 += 65536;    //处理负数地址
+                    }
                     str = std::format("x[{}] = read_mem(0x{:x} + {});", e5, e3 + e4 * 0x10000, e_GetValue(0, e1, e6));
                     break;
                 }
                 case 27:
                 {
-                    std::vector<std::string> names = { "role", "item", "submap", "magic", "shop" };
-                    str = std::format("x[{}] = {}({}).name;", e4, names[e2], e_GetValue(0, e1, e3));
+                    std::vector<std::string> names = { "Role", "Item", "Submap", "Magic", "Shop" };
+                    str = std::format("x[{}] = Get{}Name({});", e4, names[e2], e_GetValue(0, e1, e3));
                     break;
                 }
                 case 32:
@@ -227,7 +235,7 @@ std::string trans50(std::string str)
                 }
                 case 35:
                 {
-                    str = std::format("x[{}] = lib.GetKey();", e1);
+                    str = std::format("x[{}] = GetKey();", e1);
                     break;
                 }
                 case 36:
@@ -250,9 +258,9 @@ std::string trans50(std::string str)
                 {
                     str = "strs = {};\n";
                     str += std::format("for i=1, {} do\n", e_GetValue(0, e1, e2));
-                    str += std::format("strs[i] = x[x[{}] + i - 1];\n", e3);
+                    str += std::format("strs[i] = x[x[{} + i - 1]];\n", e3);
                     str += "end\n";
-                    str += std::format("x[{}] = menu(strs, #strs, {}, {});", e4, e_GetValue(1, e1, e5), e_GetValue(2, e1, e6));
+                    str += std::format("x[{}] = menu({}, {}, strs, #strs);", e4, e_GetValue(1, e1, e5), e_GetValue(2, e1, e6));
                     break;
                 }
                 case 41:
@@ -264,8 +272,9 @@ std::string trans50(std::string str)
                     }
                     else if (e2 == 1)
                     {
-                        str = std::format("DrawMainImage({} / 2, {}, {});", e_GetValue(2, e1, e5), e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
+                        str = std::format("DrawHeadImage({} / 2, {}, {});", e_GetValue(2, e1, e5), e_GetValue(0, e1, e3), e_GetValue(1, e1, e4));
                     }
+                    break;
                 }
                 case 43:
                 {
