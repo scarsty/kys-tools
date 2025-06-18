@@ -1,22 +1,134 @@
 ﻿// ConsoleApplication1.cpp: 定义控制台应用程序的入口点。
 //
 
-#include <fstream>
-#include <iostream>
+#include "Timer.h"
+#include "filefunc.h"
+#include "strfunc.h"
+#include <format>
+#include <io.h>
+#include <print>
 #include <string>
 #include <vector>
 #ifdef _WIN32
 #include <shlwapi.h>
 #endif
-#include "filefunc.h"
-#include "strfunc.h"
-#include "opencv2/opencv.hpp"
-#include <io.h>
-#include <format>
 
-using namespace std;
+#include "png.h"
 
-int getFileLength(const string& filepath)
+extern std::vector<unsigned char> COL;
+
+struct ImageData
+{
+    ImageData(int w, int h) :
+        width(w), height(h)
+    {
+        setSize(w, h);
+    }
+    void setSize(int w, int h)
+    {
+        width = w;
+        height = h;
+        data.resize(w * h * 4);    // 4 channels for RGBA
+    }
+    void setPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+    {
+        if (x < 0 || x >= width || y < 0 || y >= height)
+        {
+            return;
+        }
+        int index = (y * width + x) * 4;
+        data[index] = r;
+        data[index + 1] = g;
+        data[index + 2] = b;
+        data[index + 3] = a;
+    }
+    void setPixel(int x, int y, uint32_t c)
+    {
+        if (x < 0 || x >= width || y < 0 || y >= height)
+        {
+            return;
+        }
+        int index = (y * width + x) * 4;
+        data[index] = (c >> 24) & 0xFF;        // Red
+        data[index + 1] = (c >> 16) & 0xFF;    // Green
+        data[index + 2] = (c >> 8) & 0xFF;     // Blue
+        data[index + 3] = c & 0xFF;            // Alpha
+    }
+    void saveToFile(const std::string& filename)
+    {
+        png_structp png_ptr;
+        png_infop info_ptr;
+        FILE* png_file = fopen(filename.c_str(), "wb");
+        if (!png_file)
+        {
+            return;
+        }
+
+        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        if (png_ptr == NULL)
+        {
+            printf("ERROR:png_create_write_struct/n");
+            fclose(png_file);
+            return;
+        }
+        info_ptr = png_create_info_struct(png_ptr);
+        if (info_ptr == NULL)
+        {
+            printf("ERROR:png_create_info_struct/n");
+            png_destroy_write_struct(&png_ptr, NULL);
+            return;
+        }
+
+        png_init_io(png_ptr, png_file);
+        png_set_IHDR(
+            png_ptr,
+            info_ptr,
+            width,
+            height,
+            8,
+            PNG_COLOR_TYPE_RGBA,
+            PNG_INTERLACE_NONE,
+            PNG_COMPRESSION_TYPE_BASE,
+            PNG_FILTER_TYPE_BASE);
+
+        png_write_info(png_ptr, info_ptr);
+        png_set_packing(png_ptr);
+
+        //这里就是图像数据了
+        png_bytepp rows = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
+        for (int i = 0; i < height; ++i)
+        {
+            rows[i] = (png_bytep)(data.data() + i * width * channels);
+        }
+
+        //png_set_compression_level(png_ptr, 9);
+        png_write_image(png_ptr, rows);
+
+        png_write_end(png_ptr, info_ptr);
+
+        png_destroy_write_struct(&png_ptr, &info_ptr);
+        fclose(png_file);
+    }
+    ImageData& operator=(int i)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                setPixel(x, y, i);    // Set all pixels to the same color
+            }
+        }
+        return *this;
+    }
+
+private:
+    int width;
+    int height;
+    int channels = 4;    // RGBA
+    std::vector<unsigned char> data;
+};
+
+int getFileLength(const std::string& filepath)
 {
     FILE* file = fopen(filepath.c_str(), "rb");
     if (file)
@@ -28,7 +140,7 @@ int getFileLength(const string& filepath)
     return 0;
 }
 
-int getFileRecord(const string& filepath)
+int getFileRecord(const std::string& filepath)
 {
     auto buffer = filefunc::readFile(filepath.c_str());
     int fileLength = buffer.size();
@@ -60,9 +172,9 @@ void copyFile(std::string file1, std::string file2)
 #endif
 }
 
-int pair_grp_idx(string pathgrp, string pathidx)
+int pair_grp_idx(std::string pathgrp, std::string pathidx)
 {
-    vector<string> grps, idxs;
+    std::vector<std::string> grps, idxs;
 
     struct grpidx
     {
@@ -83,12 +195,10 @@ int pair_grp_idx(string pathgrp, string pathidx)
     for (auto idx : idxs)
     {
         auto idx0 = pathidx + idx;
-        //printf("%s, %d\n", idx.c_str(), getFileRecord(idx0));
         for (auto& gi : gggg)
         {
             if (getFileRecord(idx0) == gi.record)
             {
-                //printf("find %s\n", gi.grpname.c_str());
                 copyFile(idx0, filefunc::changeFileExt(gi.grpname, "idx"));
             }
         }
@@ -96,37 +206,69 @@ int pair_grp_idx(string pathgrp, string pathidx)
     return 0;
 }
 
-int convert_grpidx_to_png()
+int convert_grpidx_to_png(std::string idx_filename, std::string grp_filename, std::string path, bool slash = false)
 {
-    auto col = filefunc::readFile("mmap.col");
-    string offset;
-    for (int n = 0; n < 999; n++)
+    if (filefunc::fileExist(idx_filename) && filefunc::fileExist(grp_filename))
     {
-        auto filename = std::format("fight{:03}.idx", n);
-        if (filefunc::fileExist(filename))
+        Timer timer;
+
+        std::vector<int> idx;
+        filefunc::readFileToVector(idx_filename, idx);
+        idx.insert(idx.begin(), 0);
+        auto grp = filefunc::readFile(grp_filename);
+
+        std::print("{}: {} images\n", idx_filename, idx.size() - 1);
+        std::vector<int16_t> offset((idx.size() - 1) * 2);
+
+        filefunc::makePath(path);
+
+        for (int m = 0; m < idx.size() - 1; m++)
         {
-            vector<int> idx;
-            filefunc::readFileToVector(filename, idx);
-            idx.insert(idx.begin(), 0);
-            auto grp = filefunc::readFile(filefunc::changeFileExt(filename, "grp"));
-
-            printf("Found %s, %d images\n", filename.c_str(), idx.size() - 1);
-
-            for (int m = 0; m < idx.size() - 1; m++)
+            if (idx[m + 1] <= 0 || idx[m + 1] - idx[m] <= 8)
             {
-                int w = *(short*)&grp[idx[m] + 0];
-                int h = *(short*)&grp[idx[m] + 2];
-                int xoff = *(short*)&grp[idx[m] + 4];
-                int yoff = *(short*)&grp[idx[m] + 6];
-
-                if (w > 255 || h > 255)
+                continue;
+            }
+            int w = *(short*)&grp[idx[m] + 0];
+            int h = *(short*)&grp[idx[m] + 2];
+            int xoff = *(short*)&grp[idx[m] + 4];
+            int yoff = *(short*)&grp[idx[m] + 6];
+            offset[m * 2] = xoff;        // Save offsets for later use
+            offset[m * 2 + 1] = yoff;    // Save offsets for later use
+            if (w > 255 || h > 255)
+            {
+                continue;
+            }
+            if (w == 1 || h == 1)
+            {
+                continue;
+            }
+            bool have_slash = false;
+            auto col = COL;
+            for (int n = 0; n < 8; n++)
+            {
+                if (n >= 1)
                 {
-                    continue;
+                    auto change_col = [&col](int begin, int end)
+                    {
+                        auto temp0 = col[3 * end];
+                        auto temp1 = col[3 * end + 1];
+                        auto temp2 = col[3 * end + 2];
+                        for (int j = end; j > begin; j--)
+                        {
+                            col[3 * j] = col[3 * (j - 1)];
+                            col[3 * j + 1] = col[3 * (j - 1) + 1];
+                            col[3 * j + 2] = col[3 * (j - 1) + 2];
+                        }
+                        col[3 * begin] = temp0;
+                        col[3 * begin + 1] = temp1;
+                        col[3 * begin + 2] = temp2;
+                    };
+                    change_col(0xe0, 0xe7);    // 0xe0-0xe7
+                    change_col(0xf4, 0xfc);    // 0xf4-0xfc
                 }
-
-                cv::Mat image(h, w, CV_8UC4);
+                //cv::Mat image(h, w, CV_8UC4);
+                ImageData image(w, h);
                 image = 0;
-
                 int p = 0;
                 unsigned char* data = (unsigned char*)&grp[idx[m] + 8];
                 int datalong = idx[m + 1] - idx[m];
@@ -151,15 +293,24 @@ int convert_grpidx_to_png()
                             p++;
                             for (int j = 0; j < solidnum; j++)
                             {
-                                //data32[yoffset + x] = m_color32[data[p]] | AMASK;
-                                image.at<uint32_t>(yoffset + x) = 0xffffffff;
-                                char* pixel = (char*)&(image.at<uint32_t>(yoffset + x));
                                 unsigned char index = data[p];
-                                *(pixel + 0) = 4 * col[3 * index + 2];
-                                *(pixel + 1) = 4 * col[3 * index + 1];
-                                *(pixel + 2) = 4 * col[3 * index + 0];
+                                //char* pixel = (char*)&(image.at<uint32_t>(yoffset + x));
+                                //*(pixel + 0) = 4 * col[3 * index + 2];
+                                //*(pixel + 1) = 4 * col[3 * index + 1];
+                                //*(pixel + 2) = 4 * col[3 * index + 0];
+                                //*(pixel + 3) = 0xff;
+
+                                unsigned char r = 4 * col[3 * data[p] + 0];
+                                unsigned char g = 4 * col[3 * data[p] + 1];
+                                unsigned char b = 4 * col[3 * data[p] + 2];
+                                image.setPixel(x, i, r, g, b, 0xff);
+
                                 p++;
                                 x++;
+                                if (index >= 0xe0 && index < 0xe7 || index >= 0xf4 && index < 0xfc)
+                                {
+                                    have_slash = true;
+                                }
                             }
                             if (x >= w)
                             {
@@ -176,16 +327,34 @@ int convert_grpidx_to_png()
                         }
                     }
                 }
-                string path = "人物" + std::to_string(n) + "第" + std::to_string(m) + "帧.png";
-                cv::imwrite(path, image);
-                #include <format> // Add this include directive at the top of the file
-
-                // Replace the problematic line with the following:
-                offset += std::format("ID {} Frame {}, Xoff: {} Yoff {}\n", n, m, xoff, yoff);
-                //fout << "ID" << std::to_string(n) << " Frame" << std::to_string(m) << ", Xoff: " << x << " Yoff: " << y << "\n" << endl;
+                std::string image_filename = std::format("{}/{}.png", path, m);
+                if (slash && have_slash)
+                {
+                    image_filename = std::format("{}/{}_{}.png", path, m, n);
+                }
+                //cv::imwrite(image_filename, image);
+                image.saveToFile(image_filename);
+                if (!slash || !have_slash)
+                {
+                    break;
+                }
             }
         }
+        filefunc::writeVectorToFile(offset, path + "/index.ka");
+        std::print("{} seconds\n", timer.getElapsedTime());
     }
-    filefunc::writeStringToFile(offset, "offset.txt");
+
+    //std::print("{}", offset);
+    return 0;
+}
+
+int main(int argc, char* argv[])
+{
+    if (argc < 5)
+    {
+        std::print("Usage: {} <idx> <grp> <path_to_save> <slash>\n", argv[0]);
+        return 1;
+    }
+    convert_grpidx_to_png(argv[1], argv[2], argv[3], atoi(argv[4]));
     return 0;
 }

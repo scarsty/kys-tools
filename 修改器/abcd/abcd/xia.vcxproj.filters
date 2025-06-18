@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="a-star.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="grpidx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -27,7 +24,7 @@
     <ClCompile Include="C:\project\mlcc\filefunc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="C:\project\mlcc\strfunc.cpp">
+    <ClCompile Include="col.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

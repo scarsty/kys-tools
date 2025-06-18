@@ -10,46 +10,9 @@
 #include <corecrt_io.h>
 #include <direct.h>
 #include <print>
+
+/*
 #include "opencv2/opencv.hpp"
-
-using namespace std;
-
-static void copyFile(std::string file1, std::string file2)
-{
-    if (file1.empty() || file2.empty())
-    {
-        return;
-    }
-#ifdef _WIN32
-    CopyFileA(file1.c_str(), file2.c_str(), FALSE);
-#else
-    //不知咋弄，先不要了
-    //char buf[BUFSIZ];
-    //size_t size;
-
-    //FILE* source = fopen(file1.c_str(), "rb");
-    //FILE* dest = fopen(file2.c_str(), "wb");
-
-    //// clean and more secure
-    //// feof(FILE* stream) returns non-zero if the end of file indicator for stream is set
-
-    //while (size = fread(buf, 1, BUFSIZ, source))
-    //{
-    //    fwrite(buf, 1, size, dest);
-    //}
-
-    //fclose(source);
-    //fclose(dest);
-#endif
-}
-
-void mkdir(std::string pathname)
-{
-    if (access(pathname.c_str(), 0))
-    {
-        _mkdir(pathname.c_str());
-    }
-}
 
 void autocrop(cv::Mat& m)
 {
@@ -74,9 +37,9 @@ void autocrop(cv::Mat& m)
     m = m(rect);
 }
 
+//将一张大图切割成8*8的小图
 
-
-int main()
+int cut_huge_map()
 {
     cv::Mat m = cv::imread("map.bmp");
     autocrop(m);
@@ -100,4 +63,4 @@ int main()
         }
     }
     return 0;
-}
+}*/

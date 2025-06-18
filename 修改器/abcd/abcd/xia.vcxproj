@@ -84,6 +84,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -108,15 +111,15 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(CONDA_PATH)\include;../include;C:\dat\project\common;C:\dat\project\microsoft\vcpkg\installed\x64-windows\include;$(CUDA_PATH)\include;C:\dat\project\lib-collection\include</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <AdditionalIncludeDirectories>../include;C:\project\mlcc;$(CUDA_PATH)\include;C:\project\local\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(CONDA_PATH)\libs;$(USR_LOCAL)\lib\x64;C:\dat\project\lib-collection\lib\x64;C:\dat\project\microsoft\vcpkg\installed\x64-windows\debug\lib;$(CUDA_PATH)\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world320d.lib;lz4d.lib;cublas.lib;cudnn.lib;cudart.lib;leptonica-1.78.0d.lib;tesseract41d.lib;fftw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>opencv_world320d.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>C:\project\local\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world460d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>opencv_world460d.dll</DelayLoadDLLs>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -159,14 +162,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(CONDA_PATH)\libs;$(USR_LOCAL)\lib\x64;C:\project\local\lib\x64;C:\dat\project\microsoft\vcpkg\installed\x64-windows\lib;$(CUDA_PATH)\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world320.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world460.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>opencv_world320.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="a-star.cpp" />
     <ClCompile Include="C:\project\mlcc\filefunc.cpp" />
-    <ClCompile Include="C:\project\mlcc\strfunc.cpp" />
+    <ClCompile Include="col.cpp" />
     <ClCompile Include="grpidx.cpp" />
     <ClCompile Include="hug.cpp" />
   </ItemGroup>
