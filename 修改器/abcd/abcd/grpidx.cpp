@@ -242,9 +242,9 @@ int convert_grpidx_to_png(std::string idx_filename, std::string grp_filename, st
             {
                 continue;
             }
-            bool have_slash = false;
+            int max_n = 1;
             auto col = COL;
-            for (int n = 0; n < 8; n++)
+            for (int n = 0; n < 9; n++)
             {
                 if (n >= 1)
                 {
@@ -307,9 +307,18 @@ int convert_grpidx_to_png(std::string idx_filename, std::string grp_filename, st
 
                                 p++;
                                 x++;
-                                if (index >= 0xe0 && index < 0xe7 || index >= 0xf4 && index < 0xfc)
+                                if (n == 0)
                                 {
-                                    have_slash = true;
+                                    //注意一个是8一个是9，取最大值
+                                    //若一个图片同时含有这两个范围的颜色，为呈现变化取8，否则严格来说是72
+                                    if (index >= 0xe0 && index <= 0xe7)
+                                    {
+                                        if (max_n == 1 || max_n == 9) { max_n = 8; }
+                                    }
+                                    if (index >= 0xf4 && index <= 0xfc)
+                                    {
+                                        if (max_n == 1) { max_n = 9; }
+                                    }
                                 }
                             }
                             if (x >= w)
@@ -328,13 +337,13 @@ int convert_grpidx_to_png(std::string idx_filename, std::string grp_filename, st
                     }
                 }
                 std::string image_filename = std::format("{}/{}.png", path, m);
-                if (slash && have_slash)
+                if (slash && max_n > 1)
                 {
                     image_filename = std::format("{}/{}_{}.png", path, m, n);
                 }
                 //cv::imwrite(image_filename, image);
                 image.saveToFile(image_filename);
-                if (!slash || !have_slash)
+                if (!slash || n + 1 >= max_n)
                 {
                     break;
                 }
